@@ -1,19 +1,35 @@
 "use client";
 import ArtistCards from "@/components/artists/ArtistCards";
-import {useListAlbumQuery, useListArtistQuery} from "@/lib/features/other/publicApiSlice";
+import {
+  useListAlbumQuery,
+  useListArtistQuery,
+  useListPlaylistQuery,
+  useListTrackQuery
+} from "@/lib/features/other/publicApiSlice";
 import Link from "next/link";
-import {Button} from "@/components/ui/button";
-import {Globe} from "lucide-react";
 import {Skeleton} from "@/components/ui/skeleton";
 import AlbumCards from "@/components/albums/AlbumCards";
+import TrackCards from "@/components/tracks/TrackCards";
+import PlaylistCards from "@/components/playlists/PlaylistCards";
+import TrackCardsLittle from "@/components/tracks/TrackCardsLittle";
+import Footer from "@/components/general/Footer";
+import {Sidebar} from "@/components/general/Siderbar";
+import Header from "@/components/general/Header";
+import PreviewPlayer from "@/components/tracks/PreviewPlayer";
+import {useAppSelector} from "@/lib/hooks";
+import FooterLogin from "@/components/general/FooterLogin";
+
 
 export default function Home() {
   const {data: topArtists, isLoading, isFetching} = useListArtistQuery()
-  const {data: topAlbums, isLoading: isLoadingAlbums, isFetching: isFetchingAlbums} = useListAlbumQuery()
-  console.log(topArtists)
+  const {data: topAlbums, isLoading: isLoadingAlbums, isFetching: isFetchingAlbums} = useListAlbumQuery({})
+  const {data: topTracks, isLoading: isLoadingTrack, isFetching: isFetchingTrack} = useListTrackQuery({})
+  const {data: topPlaylists, isLoading: isLoadingPlaylist, isFetching: isFetchingPlaylist} = useListPlaylistQuery()
 
+  const load = isLoading || isFetching || isLoadingAlbums || isFetchingAlbums || isLoadingTrack || isFetchingTrack || isLoadingPlaylist || isFetchingPlaylist;
 
-  const load = isLoading || isFetching || isLoadingAlbums || isFetchingAlbums;
+  const {currentTrack} = useAppSelector(state => state.track)
+
 
   let loader = null;
   if (load) {
@@ -44,99 +60,62 @@ export default function Home() {
     )
   }
 
+  console.log(currentTrack?.color)
+
   return (
-    <section className="flex flex-col items-start text-xl font-bold">
-      <div>
-        <div className="flex items-center justify-between w-full mb-2">
-          <Link href={"/artists"} className="mt-3 hover:text-white/60">Popular artists</Link>
-          <Link href={"/artists"} className="text-sm mt-4 text-white/30 hover:text-white/80">Show all</Link>
+    <>
+      <div className="grid grid-cols-10">
+        <Sidebar/>
+        <div
+          className={`flex flex-col h-[86vh] col-span-8 overflow-auto rounded-lg bg-gradient-to-b from-[#202020] via-[#131313] to-[#131313] mt-2 mr-2`}>
+          <Header/>
+
+          <section className="flex flex-col items-start text-xl font-bold space-y-4 mx-6 my-6">
+
+            <div className="flex items-center">
+              <Link href={"/tracks"} className="mt-4 ml-4">Top tracks</Link>
+            </div>
+            <TrackCardsLittle tracks={topTracks?.results.slice(0, 6)}/>
+
+            <div>
+              <div className="flex items-center justify-between w-full mb-2">
+                <Link href={"/artists"} className="mt-3 hover:text-white/60 ml-4">Popular artists</Link>
+                <Link href={"/artists"} className="text-sm mt-4 text-white/30 hover:text-white/80">Show all</Link>
+              </div>
+              <ArtistCards artists={topArtists?.results.slice(0, 5)}/>
+            </div>
+
+            <div>
+              <div className="flex items-center justify-between w-full mb-2">
+                <Link href={"/albums"} className="mt-3 hover:text-white/60 ml-4">Popular albums</Link>
+                <Link href={"/albums"} className="text-sm mt-4 text-white/30 hover:text-white/80">Show all</Link>
+              </div>
+              <AlbumCards albums={topAlbums?.results.slice(0, 5)}/>
+            </div>
+
+            <div>
+              <div className="flex items-center justify-between w-full mb-2">
+                <Link href={"/playlists"} className="mt-3 hover:text-white/60 ml-4">Popular playlists</Link>
+                <Link href={"/playlists"} className="text-sm mt-4 text-white/30 hover:text-white/80">Show all</Link>
+              </div>
+              <PlaylistCards playlists={topPlaylists?.results.slice(0, 5)}/>
+            </div>
+
+            <div>
+              <div className="flex items-center justify-between w-full mb-2">
+                <Link href={"/tracks"} className="mt-3 hover:text-white/60 ml-4">Popular tracks</Link>
+                <Link href={"/tracks"} className="text-sm mt-4 text-white/30 hover:text-white/80">Show all</Link>
+              </div>
+              <TrackCards tracks={topTracks?.results.slice(0, 5)}/>
+            </div>
+
+
+            <Footer/>
+          </section>
+
         </div>
-        <ArtistCards artists={topArtists?.results.slice(0, 5)}/>
       </div>
-
-      <div>
-        <div className="flex items-center justify-between w-full mb-2">
-          <Link href={"/albums"} className="mt-3 hover:text-white/60">Popular albums</Link>
-          <Link href={"/albums"} className="text-sm mt-4 text-white/30 hover:text-white/80">Show all</Link>
-        </div>
-        <AlbumCards albums={topAlbums?.results.slice(0, 5)}/>
-      </div>
-
-      <h1 className="mt-8">Top Tracks</h1>
-      <div className="grid w-full grid-cols-12 gap-4">
-        {/*{topTracks.map((track) => (*/}
-        {/*  <Link*/}
-        {/*    href={`/tracks/${track.id}`}*/}
-        {/*    key={track.id}*/}
-        {/*    className="flex items-center justify-between col-span-4 pr-4 truncate rounded-md group/item bg-paper-600 hover:bg-paper-400"*/}
-        {/*  >*/}
-        {/*    <div className="flex items-center gap-4">*/}
-        {/*      {track.album.images.length > 0 ? (*/}
-        {/*        <Image*/}
-        {/*          src={track.album.images[0].url}*/}
-        {/*          alt={track.name}*/}
-        {/*          width={72}*/}
-        {/*          height={72}*/}
-        {/*          className="object-cover h-full rounded-tl-md rounded-bl-md aspect-square"*/}
-        {/*        />*/}
-        {/*      ) : (*/}
-        {/*        <Album size={20}/>*/}
-        {/*      )}*/}
-        {/*      <h3 className="font-semibold truncate">{track.name}</h3>*/}
-        {/*    </div>*/}
-
-        {/*    <PlayTrackButton*/}
-        {/*      track={track}*/}
-        {/*      variant="filled"*/}
-        {/*      className="invisible w-12 h-12 text-3xl group/btn group-hover/item:visible"*/}
-        {/*    />*/}
-        {/*  </Link>*/}
-        {/*))}*/}
-      </div>
-
-      <h1 className="mt-16">Recently played</h1>
-      {/*<TrackCards tracks={recentlyPlayed}/>*/}
-
-      <h1 className="mt-16">Time Capsule</h1>
-      {/*<TrackCards tracks={allTimeTopTracks}/>*/}
-
-      <h1 className="mt-16">Top Artists</h1>
-      {/*<ArtistCards artists={topArtists}/>*/}
-
-      <h1 className="mt-16">New releases</h1>
-      {/*<AlbumCards albums={newReleases}/>*/}
-
-      <h1 className="mt-16">New releases</h1>
-      <h1 className="mt-16">New releases</h1>
-      <h1 className="mt-16">New releases</h1>
-      <h1 className="mt-16">New releases</h1>
-      <h1 className="mt-16">New releases</h1>
-      <h1 className="mt-16">New releases</h1>
-      <h1 className="mt-16">New releases</h1>
-
-      <footer>
-        <div className="grid lg:grid-cols-3 grid-cols-2 gap-2 p-4 pt-10 text-xs text-muted-foreground">
-          <a href="#" className="block">
-            Legal
-          </a>
-          <a href="#" className="block">
-            Safety & Privacy Center
-          </a>
-          <a href="#" className="block">
-            Privacy Policy
-          </a>
-          <a href="#" className="block">
-            Cookies
-          </a>
-          <a href="#" className="block">
-            About Ads
-          </a>
-          <a href="#" className="block">
-            Accessibility
-          </a>
-        </div>
-      </footer>
-
-    </section>
+      {currentTrack ? <PreviewPlayer/> : <FooterLogin/>}
+    </>
   )
 }
