@@ -1,11 +1,27 @@
 import {apiPublicSlice} from "@/lib/services/apiPublicSlice";
-import {Album, Albums, Artist, Artists, Playlist, Playlists, Track, Tracks} from "@/types/types";
+import {
+  Albums,
+  Artist,
+  Artists,
+  DetailAlbum,
+  DetailPlaylist,
+  DetailTrack,
+  Playlists,
+  Tracks, User
+} from "@/types/types";
 
 
 const publicApiSlice = apiPublicSlice.injectEndpoints({
   endpoints: builder => ({
-    listArtist: builder.query<Artists, void>({
-      query: () =>
+    listUser: builder.query<User[], any | void>({
+      query: ({}) =>
+        `/auth/users/`,
+    }),
+    retrieveUser: builder.query<User, number>({
+      query: (id) => `/auth/users/${id}/`,
+    }),
+    listArtist: builder.query<Artists, any | void>({
+      query: ({}) =>
         `/artists/`,
     }),
     retrieveArtist: builder.query<Artist, string>({
@@ -15,21 +31,21 @@ const publicApiSlice = apiPublicSlice.injectEndpoints({
       query: ({page = 1, artistSlug = ''}) =>
         `/albums/?page=${page}&artist__slug=${artistSlug}`,
     }),
-    retrieveAlbum: builder.query<Album, string>({
+    retrieveAlbum: builder.query<DetailAlbum, string>({
       query: (slug) => `/albums/${slug}/`,
     }),
     listTrack: builder.query<Tracks, any | void>({
-      query: ({page = 1, artistSlug = ''}) =>
-        `/tracks/?page=${page}&artist__slug=${artistSlug}`,
+      query: ({page = 1, artistSlug = '', genreSlug = '', albumSlug = ''}) =>
+        `/tracks/?page=${page}&artist__slug=${artistSlug}&genre__slug=${genreSlug}&album__slug=${albumSlug}`,
     }),
-    retrieveTrack: builder.query<Track, string>({
+    retrieveTrack: builder.query<DetailTrack, string>({
       query: (slug) => `/tracks/${slug}/`,
     }),
-    listPlaylist: builder.query<Playlists, void>({
-      query: () =>
-        `/playlists/`,
+    listPlaylist: builder.query<Playlists, any | void>({
+      query: ({page = 1, userId = ''}) =>
+        `/playlists/?page=${page}&user__id=${userId}`,
     }),
-    retrievePlaylist: builder.query<Playlist, string>({
+    retrievePlaylist: builder.query<DetailPlaylist, string>({
       query: (slug) => `/playlists/${slug}/`,
     }),
   })
@@ -37,6 +53,8 @@ const publicApiSlice = apiPublicSlice.injectEndpoints({
 
 
 export const {
+  useListUserQuery,
+  useRetrieveUserQuery,
   useListArtistQuery,
   useRetrieveArtistQuery,
   useListAlbumQuery,

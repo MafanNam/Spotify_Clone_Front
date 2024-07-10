@@ -11,7 +11,7 @@ export default function TrackCards({tracks}: Props) {
 
   return (
     <CardItemGrid>
-      {tracks?.map((track) => (
+      {tracks?.map((track, index) => (
         <CardItem
           key={track.id}
           id={track.id}
@@ -19,9 +19,11 @@ export default function TrackCards({tracks}: Props) {
           heading={track.title}
           subheading={track.artist.display_name}
           altTitle={track.title}
-          image={track.image}
+          image={track.album.image}
           track_slug={track.slug}
-          type="albums"
+          tracks={tracks}
+          index={index}
+          type="tracks"
         />
       ))}
     </CardItemGrid>

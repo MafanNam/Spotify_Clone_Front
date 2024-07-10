@@ -1,36 +1,22 @@
 "use client";
 
 import {Track} from "@/types/types";
-import {fmtMSS} from "@/utils/clientUtils";
-import {Clock3, Music} from "lucide-react";
+import {CircleCheck, CirclePlus, Clock3, Music} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import {useState} from "react";
 import PlayTrackButton from "./PlayTrackButton";
-import {Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table";
+import {useAppSelector} from "@/lib/hooks";
+import {formatTime} from "@/utils/clientUtils";
 
 interface Props {
   tracks: Track[] | undefined;
   showHeader?: boolean;
+  showCardHeader?: boolean;
   showCover?: boolean;
   showAlbum?: boolean;
   showPlaysCount?: boolean;
   showSubtitle?: boolean;
-}
-
-function formatTime(time: string) {
-  // Split the time string into its components
-  const parts = time.split(':');
-  let hours = parseInt(parts[0], 10);
-  const minutes = parseInt(parts[1], 10);
-  const seconds = Math.floor(parseFloat(parts[2])); // Remove milliseconds
-
-  // Format the time string to "H:MM"
-  if (hours === 0) {
-    return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-  } else {
-    return `${hours}:${minutes < 10 ? '0' : ''}${minutes}`;
-  }
 }
 
 export default function TracksTable({
@@ -38,10 +24,12 @@ export default function TracksTable({
                                       showSubtitle = false,
                                       showCover = false,
                                       showHeader = false,
+                                      showCardHeader = false,
                                       showAlbum = false,
                                       showPlaysCount = false,
                                     }: Props) {
   const [hoveredRow, setHoveredRow] = useState<number | null>(null);
+  const {activeTrack} = useAppSelector(state => state.track)
 
   return (
     <div className="mt-8">
@@ -49,15 +37,13 @@ export default function TracksTable({
 
       {showHeader && (
         <>
-          <header className="grid grid-cols-12 gap-2 p-4 pb-1 text-white/60">
-            <div className="col-span-1 tracking-wider text-left uppercase">
+          <header className="grid grid-cols-12 gap-2 p-4 pb-1 mb-2 text-white/60">
+            <div className="text-left uppercase" style={{width: '30px'}}>
               #
             </div>
 
             <div
-              className={`${
-                (showAlbum || showPlaysCount) ? "col-span-6" : "col-span-10"
-              } text-sm text-left`}
+              className={`${(showAlbum || showPlaysCount) ? "col-span-6" : "col-span-10"} text-sm text-left`}
             >
               Title
             </div>
@@ -80,13 +66,42 @@ export default function TracksTable({
           </header>
 
           {/* Divider */}
-          <div className="col-span-12 border-b border-paper-600"></div>
+          <div className="col-span-12 border-b border-[#404040]/80"></div>
         </>
+      )}
+
+      {showCardHeader && (
+        <header className="bg-white/10 hover:bg-white/20 w-full h-20 mb-0.5 shadow-lg rounded-t-lg overflow-hidden">
+          <Link href={`/albums/${tracks?.[0]?.album?.slug}`} className="">
+            <div className="flex justify-start items-center space-x-4">
+              {tracks?.[0]?.album ? (
+                <Image
+                  src={tracks[0].album?.image}
+                  alt={tracks[0].album?.title}
+                  height={80}
+                  width={80}
+                  className="aspect-square object-cover h-20 w-20"
+                  priority
+                />
+              ) : (
+                <div>
+                  <Music size={80}/>
+                </div>
+              )}
+              <div>
+                <h5 className="text-xs font-normal text-white">From the album</h5>
+                <h2 className="text-white text-lg font-semibold hover:underline">
+                  {tracks?.[0]?.album?.title}
+                </h2>
+              </div>
+            </div>
+          </Link>
+        </header>
       )}
 
       {/* Table Rows */}
 
-      <div className="w-full col-span-12 mt-2">
+      <div className="w-full col-span-12">
         {tracks?.map((track, index) => (
           <div
             className={`grid py-2 px-4 rounded-md grid-cols-12 group/item ${
@@ -97,10 +112,15 @@ export default function TracksTable({
             onMouseLeave={() => setHoveredRow(null)}
           >
             {hoveredRow === index ? (
-              <PlayTrackButton track={track} className="text-xl"/>
+              <PlayTrackButton track={track} tracks={tracks} index={index} lines={true} className="text-xl w-1/2"/>
             ) : (
-              <span className="flex items-center col-span-1 text-sm text-white/60">
-                {index + 1}
+              <span
+                className="flex items-center col-span-1 text-sm text-white/60">
+                {activeTrack?.slug === track.slug ? (
+                  <PlayTrackButton track={track} tracks={tracks} index={index} lines={true} className="text-xl w-1/2"/>
+                ) : (
+                  index + 1
+                )}
               </span>
             )}
 
@@ -128,17 +148,19 @@ export default function TracksTable({
                     />
                   ))}
 
-                <div className="w-full pr-3 truncate">
-                  <Link
-                    href={`/tracks/${track.slug}`}
-                    className="w-10/12 text-sm font-medium truncate cursor-pointer hover:underline"
-                  >
-                    {track.title}
-                  </Link>
+                <div className="w-full pr-3 truncate flex items-center justify-between">
+                  <div>
+                    <Link
+                      href={`/tracks/${track.slug}`}
+                      className={`w-10/12 text-sm font-medium truncate cursor-pointer hover:underline ${
+                        activeTrack?.slug === track.slug && "text-green-500"}`}
+                    >
+                      {track.title}
+                    </Link>
 
-                  {showSubtitle && (
-                    <div
-                      className="flex flex-wrap items-center w-full gap-1 pr-3 text-sm text-white/60 group-hover/item:text-white">
+                    {showSubtitle && (
+                      <div
+                        className="flex flex-wrap items-center w-full gap-1 pr-3 text-sm text-white/60 group-hover/item:text-white">
                       <span className="truncate">
                           <Link
                             key={track.artist.id + track.id}
@@ -148,16 +170,17 @@ export default function TracksTable({
                             {track.artist.display_name}
                           </Link>
                       </span>
-                    </div>
-                  )}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
 
             {showAlbum && (
-              <div className="flex items-center w-10/12 col-span-4 text-sm text-white/60">
+              <div className="flex items-center justify-between w-full col-span-4 text-sm text-white/60">
                 <Link
-                  href={`/albums/${track.album.id}`}
+                  href={`/albums/${track.album.slug}`}
                   className="truncate hover:text-white hover:underline"
                 >
                   {track.album.title}
@@ -174,36 +197,16 @@ export default function TracksTable({
             )}
 
             <small className="flex items-center justify-center col-span-1 text-sm font-medium text-white/60 ">
-              {formatTime(track.duration)}
+              <div className="flex items-center w-full gap-3">
+                <CirclePlus size={18}
+                            className="opacity-0 group-hover/item:opacity-100 hover:text-white transition duration-150 ease-in-out transform hover:scale-105"/>
+                {/*<CircleCheck size={18} className="text-primary"/>*/}
+              </div>
+              <span className="mr-3 lg:6 xl:mr-7">{formatTime(track.duration)}</span>
             </small>
           </div>
         ))}
       </div>
     </div>
-
-    // <div className="mt-8">
-    //   <Table>
-    //     <TableCaption>A list of your recent invoices.</TableCaption>
-    //     <TableHeader>
-    //       <TableRow>
-    //         <TableHead className="w-[10px]">#</TableHead>
-    //         <TableHead>Title</TableHead>
-    //         <TableHead>Album</TableHead>
-    //         <TableHead className="flex justify-center pt-3"><Clock3 size={20}/></TableHead>
-    //       </TableRow>
-    //     </TableHeader>
-    //     <TableBody>
-    //       {tracks?.map((track, index) => (
-    //         <TableRow>
-    //           <TableCell className="text-white/60">1</TableCell>
-    //           <TableCell>Paid</TableCell>
-    //           <TableCell>Credit Card</TableCell>
-    //           <TableCell className="text-right">$250.00</TableCell>
-    //         </TableRow>
-    //       ))}
-    //     </TableBody>
-    //   </Table>
-    // </div>
-
   );
 }
