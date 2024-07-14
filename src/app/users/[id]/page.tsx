@@ -2,14 +2,19 @@
 
 import {Dot, Music} from "lucide-react";
 import Image from "next/image";
-import {useListPlaylistQuery, useRetrieveUserQuery} from "@/lib/features/other/publicApiSlice";
-import {useAppSelector} from "@/lib/hooks";
-import Header from "@/components/general/Header";
-import PreviewPlayer from "@/components/tracks/PreviewPlayer";
-import FooterLogin from "@/components/general/FooterLogin";
+import {
+  useListPlaylistQuery, useListRecentlyListenTracksQuery,
+  useListUserFollowersQuery, useListUserFollowingQuery,
+  useRetrieveUserQuery
+} from "@/lib/features/other/publicApiSlice";
 import Footer from "@/components/general/Footer";
 import Link from "next/link";
 import PlaylistCards from "@/components/playlists/PlaylistCards";
+import TracksTable from "@/components/tracks/TracksTable";
+import UserCards from "@/components/users/UserCards";
+import TitleShowAll from "@/components/ui/title-show-all";
+import PlayButtonAndOther from "@/components/ui/play-button-and-other";
+import MainSection from "@/components/general/main-section";
 
 interface Props {
   params: {
@@ -24,131 +29,141 @@ export default function UserPage({params}: Props) {
     isLoading: isLoadingP,
     isFetching: isFetchingP,
   } = useListPlaylistQuery({userId: user?.id || 0})
+  const {
+    data: recentlyTracks,
+    isLoading: isLoadingReTracks,
+    isFetching: isFetchingReTracks,
+  } = useListRecentlyListenTracksQuery({userId: user?.id || 0})
+  const {
+    data: userFollowing,
+    isLoading: isLoadingFollowing,
+    isFetching: isFetchingFollowing,
+  } = useListUserFollowingQuery({userId: user?.id || 0})
+  const {
+    data: userFollowers,
+    isLoading: isLoadingFollowers,
+    isFetching: isFetchingFollowers,
+  } = useListUserFollowersQuery({userId: user?.id || 0})
 
-  const load = isLoading || isFetching || isLoadingP || isFetchingP
+  const load = (
+    isLoading || isFetching || isLoadingP || isFetchingP ||
+    isLoadingReTracks || isFetchingReTracks || isLoadingFollowers || isFetchingFollowers ||
+    isLoadingFollowing || isFetchingFollowing
+  )
 
-  const {activeTrack, currentIndex} = useAppSelector(state => state.track)
-
-  const UserBgColor = user?.color || "#202020";
+  const userBgColor = user?.color || "#202020";
 
   return (
-    <>
-      <div
-        className="h-full rounded-lg"
-        style={{
-          backgroundImage: `linear-gradient(to bottom, ${UserBgColor}, #131313, #131313)`,
-        }}
-      >
-        <Header/>
-        <div className="h-60 bg-opacity-30 bg-black">
-          <div className="flex items-end gap-6 p-4 pt-10">
-            {user && (
-              <>
-                {user.image.length > 0 ? (
-                  <Image
-                    src={user.image}
-                    alt={user.display_name}
-                    height={170}
-                    width={170}
-                    className="aspect-square object-cover shadow-2xl rounded-full h-44 w-44"
-                    priority
-                  />
-                ) : (
-                  <div>
-                    <Music size={160}/>
-                  </div>
-                )}
+    <MainSection bgColor={userBgColor}>
+      <div className="h-60 bg-opacity-30 bg-black">
+        <div className="flex items-end gap-6 p-4 pt-10">
+          {user && (
+            <>
+              {user.image.length > 0 ? (
+                <Image
+                  src={user.image}
+                  alt={user.display_name}
+                  height={170}
+                  width={170}
+                  className="aspect-square object-cover shadow-2xl rounded-full h-44 w-44"
+                  priority
+                />
+              ) : (
+                <div>
+                  <Music size={160}/>
+                </div>
+              )}
 
-                <div className="flex flex-col gap-3">
-                  <h5 className="text-xs font-bold text-white/80">Profile</h5>
-                  <h2 className="text-7xl font-bold">{user.display_name}</h2>
+              <div className="flex flex-col gap-3">
+                <h5 className="text-xs font-semibold text-white/80">Profile</h5>
+                <h2 className="text-8xl font-black drop-shadow-sm">{user.display_name}</h2>
 
-                  <div className="flex items-center text-sm font-medium">
-                    {user.playlists_count >= 0 && (
-                      <>
+                <div className="flex items-center text-sm font-medium">
+                  {user.playlists_count >= 0 && (
+                    <>
                         <span>
                           {user.playlists_count} Public {user.playlists_count === 1 ? "Playlist" : "Playlists"}
                         </span>
-                      </>
-                    )}
-                    {user.followers_count >= 0 && (
-                      <>
-                        <Dot/>
-                        <Link href={`/users/${user.id}/followers`} className="hover:underline">
-                          {user.followers_count.toLocaleString()} {user.followers_count === 1 ? "Follower" : "Followers"}
-                        </Link>
-                      </>
-                    )}
-                    {user.following_count >= 0 && (
-                      <>
-                        <Dot/>
-                        <Link href={`/users/${user.id}/following`} className="hover:underline">
-                          {user.following_count.toLocaleString()} Following
-                        </Link>
-                      </>
-                    )}
-                  </div>
+                    </>
+                  )}
+                  {user.followers_count >= 0 && (
+                    <>
+                      <Dot/>
+                      <Link href={`/users/${user.id}/followers`} className="hover:underline">
+                        {user.followers_count.toLocaleString()} {user.followers_count === 1 ? "Follower" : "Followers"}
+                      </Link>
+                    </>
+                  )}
+                  {user.following_count >= 0 && (
+                    <>
+                      <Dot/>
+                      <Link href={`/users/${user.id}/following`} className="hover:underline">
+                        {user.following_count.toLocaleString()} Following
+                      </Link>
+                    </>
+                  )}
                 </div>
-              </>
-            )}
-          </div>
-        </div>
-
-        <div className="mx-6 my-6">
-
-          {(userPlaylists?.count || 0) > 0 && (
-            <div>
-              <div className="flex items-center justify-between w-full mb-3">
-                <Link href={`/users/${user?.id}/playlists`} className="mt-3 hover:underline text-2xl font-bold ml-4">
-                  Public Playlists
-                </Link>
-                <Link href={`/users/${user?.id}/playlists`}
-                      className="text-sm mt-4 text-white/60 font-normal hover:underline">
-                  Show all
-                </Link>
               </div>
-              <PlaylistCards playlists={userPlaylists?.results.slice(0, 5)}/>
-            </div>
+            </>
           )}
-
-          {/*<div>*/}
-          {/*  <TracksTable*/}
-          {/*    tracks={album?.tracks}*/}
-          {/*    showHeader*/}
-          {/*    showSubtitle*/}
-          {/*  />*/}
-          {/*</div>*/}
-
-          {/*{album?.release_date && (*/}
-          {/*  <div>*/}
-          {/*    <p className="font-normal text-sm mt-10 text-white/60">*/}
-          {/*      {format(new Date(album.release_date), 'MMMM dd, yyyy')}*/}
-          {/*    </p>*/}
-          {/*    <div className="font-normal text-xs text-white/50">*/}
-          {/*      <p>© {format(new Date(album.release_date), 'yyyy')} {album?.artist?.display_name}</p>*/}
-          {/*      <p>℗ {format(new Date(album.release_date), 'yyyy')} {album?.artist?.display_name}</p>*/}
-          {/*    </div>*/}
-          {/*  </div>*/}
-          {/*)}*/}
-
-          {/*{(artistAlbums?.count || 0) > 0 &&*/}
-          {/*  <div className="my-8 mt-16">*/}
-          {/*    <div className="flex items-center justify-between w-full mb-2">*/}
-          {/*      <Link href={`/albums`} className="mt-3 hover:underline font-bold text-2xl">*/}
-          {/*        More by {album?.artist.display_name}*/}
-          {/*      </Link>*/}
-          {/*      <Link href={`/albums`} className="text-sm mt-4 font-bold text-white/50 hover:underline">*/}
-          {/*        See discography*/}
-          {/*      </Link>*/}
-          {/*    </div>*/}
-          {/*    <AlbumCards albums={artistAlbums?.results.slice(0, 5)}/>*/}
-          {/*  </div>*/}
-          {/*}*/}
-
-          <Footer/>
         </div>
       </div>
-      {activeTrack ? <PreviewPlayer/> : <FooterLogin/>}
-    </>
+
+      <div className="mx-6 my-6 space-y-8">
+
+        <PlayButtonAndOther
+          isPlayButton={false}
+          isFollow
+        />
+
+        {(recentlyTracks?.count || 0) > 0 && (
+          <TitleShowAll
+            title="Top tracks this month"
+            titlePB="Only visible to you"
+            href={`/users/${user?.id}/top/tracks`}
+            isShowAll={(recentlyTracks?.count || 0) > 4}
+          >
+            <TracksTable
+              tracks={recentlyTracks?.results.slice(0, 4)}
+              showCover
+              showSubtitle
+              showAlbum
+            />
+          </TitleShowAll>
+        )}
+
+        {(userPlaylists?.count || 0) > 0 && (
+          <TitleShowAll
+            title="Public Playlists"
+            href={`/users/${user?.id}/playlists`}
+            isShowAll={(userPlaylists?.count || 0) > 5}
+          >
+            <PlaylistCards playlists={userPlaylists?.results.slice(0, 5)}/>
+          </TitleShowAll>
+        )}
+
+        {(userFollowers?.length || 0) > 0 && (
+          <TitleShowAll
+            title="Followers"
+            href={`/users/${user?.id}/followers`}
+            isShowAll={(userFollowers?.length || 0) > 5}
+          >
+            <UserCards users={userFollowers?.slice(0, 5)}/>
+          </TitleShowAll>
+        )}
+
+        {(userFollowers?.length || 0) > 0 && (
+          <TitleShowAll
+            title="Following"
+            href={`/users/${user?.id}/following`}
+            isShowAll={(userFollowing?.length || 0) > 5}
+          >
+            <UserCards users={userFollowing?.slice(0, 5)}/>
+          </TitleShowAll>
+        )}
+
+        <Footer/>
+      </div>
+    </MainSection>
   );
 }

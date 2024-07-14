@@ -36,6 +36,19 @@ export interface User extends BaseApi {
   playlists_count: number;
 }
 
+export interface ShortUser extends BaseApi {
+  display_name: string;
+  type_profile: string;
+  artist_slug: string;
+  image: string;
+  followers_count: number;
+  is_premium: boolean;
+}
+
+export interface ShortUsers extends ListBaseApi {
+  results: ShortUser[];
+}
+
 export interface Artist extends BaseApi {
   slug: string;
   user: {
@@ -181,4 +194,20 @@ export interface DetailPlaylist extends Playlist {
 
 export interface Playlists extends ListBaseApi {
   results: Playlist[];
+}
+
+
+export interface RecentlyListenTracks extends ListBaseApi {
+  results: Track[];
+}
+
+export interface Genre extends BaseApi {
+  slug: string;
+  name: string;
+  image: string;
+  color: string;
+}
+
+export interface Genres extends ListBaseApi {
+  results: Genre[];
 }
