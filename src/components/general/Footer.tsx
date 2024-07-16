@@ -5,9 +5,11 @@ import {Separator} from "@/components/ui/separator";
 
 
 export default function Footer() {
+  const currentYear = new Date().getFullYear();
+
   return (
     <footer className="w-full pt-10">
-      <div className="mx-auto w-full max-w-screen-xl text-sm">
+      <div className="mx-auto w-full text-sm">
         <div className="grid grid-cols-2 gap-8 px-4 py-4 md:grid-cols-5">
           <div>
             <h2 className="mb-3 text-sm font-semibold text-white">Company</h2>
@@ -103,11 +105,13 @@ export default function Footer() {
           </div>
         </div>
 
-        <Separator className="m-4"/>
+        <div className="p-6">
+          <Separator/>
+        </div>
 
         <div className="px-4 py-6 md:flex md:items-center md:justify-between">
             <span className="text-sm text-white/70 sm:text-center font-normal pb-6">
-              © 2024 Spotify AB
+              © {currentYear} Spotify AB
             </span>
         </div>
       </div>

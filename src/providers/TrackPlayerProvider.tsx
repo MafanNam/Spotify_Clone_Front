@@ -4,6 +4,8 @@ import React, {useEffect, useState, createContext, useContext, Dispatch, SetStat
 import {useAppSelector, useAppDispatch} from "@/lib/hooks";
 import {nextSong as nextSongAction, prevSong as prevSongAction} from "@/lib/features/tracks/trackSlice";
 import {Track} from "@/types/types";
+import {usePathname} from "next/navigation";
+import {accountUrl} from "@/utils/consts";
 
 interface TrackProviderState {
   currentTrackAudio: HTMLAudioElement | null;
@@ -40,6 +42,9 @@ interface Props {
 }
 
 export default function TrackPlayerProvider({children}: Props) {
+  const pathname = usePathname();
+  const isAccountPage = pathname.startsWith(accountUrl);
+
   const {activeTrack, currentIndex, currentTracks} = useAppSelector((state) => state.track);
   const dispatch = useAppDispatch();
 
@@ -88,6 +93,8 @@ export default function TrackPlayerProvider({children}: Props) {
     setCurrentTrackAudio(tempAudio);
 
     return () => {
+      tempAudio.removeEventListener("loadeddata", setAudioData);
+      tempAudio.removeEventListener("timeupdate", setAudioTime);
       tempAudio.removeEventListener("ended", handleEnded);
       pause();
       setCurrentTrackAudio(null);
@@ -119,7 +126,7 @@ export default function TrackPlayerProvider({children}: Props) {
   };
 
   useEffect(() => {
-    if (currentTrackAudio && drag) {
+    if (currentTrackAudio) {
       currentTrackAudio.currentTime = Math.round((drag * currentTrackAudio.duration) / 100);
     }
   }, [drag]);
@@ -182,6 +189,12 @@ export default function TrackPlayerProvider({children}: Props) {
   const toggleLoop = () => {
     setLoop(!loop);
   };
+
+  useEffect(() => {
+    if (isAccountPage && isPlaying) {
+      pause();
+    }
+  }, [isPlaying, isAccountPage]);
 
   const value = {
     currentTrackAudio,

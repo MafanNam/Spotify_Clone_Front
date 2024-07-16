@@ -2,10 +2,11 @@
 
 import {useListPlaylistQuery, useListTrackQuery, useRetrieveGenreQuery,} from "@/lib/features/other/publicApiSlice";
 import TracksTable from "@/components/tracks/TracksTable";
-import Footer from "@/components/general/Footer";
 import TitleShowAll from "@/components/ui/title-show-all";
 import PlaylistCards from "@/components/playlists/PlaylistCards";
 import MainSection from "@/components/general/main-section";
+import FullScreenSpinner from "@/components/general/FullScreenSpinner";
+import ContentSection from "@/components/general/content-section";
 
 interface Props {
   params: {
@@ -14,7 +15,11 @@ interface Props {
 }
 
 export default function Page({params}: Props) {
-  const {data: genre, isLoading, isFetching} = useRetrieveGenreQuery(params.slug)
+  const {
+    data: genre,
+    isLoading,
+    isFetching,
+  } = useRetrieveGenreQuery(params.slug)
   const {
     data: genrePlaylists,
     isLoading: isLoadingP,
@@ -42,55 +47,39 @@ export default function Page({params}: Props) {
         </div>
       </div>
 
-      <div className="mx-6 my-6 space-y-8">
+      <ContentSection>
 
-        {(genreTracks?.count || 0) > 0 &&
-          <TitleShowAll
-            title={`Popular ${genre?.name} tracks`}
-            href={`/genre/${params.slug}/tracks`}
-            isShowAll={(genreTracks?.count || 0) > 5}
-          >
-            <TracksTable
-              tracks={genreTracks?.results.slice(0, 5)}
-              showCover
-              showPlaysCount
-              showSubtitle
-            />
-          </TitleShowAll>
-        }
+        {load ? <FullScreenSpinner/> : (
+          <>
 
-        {(genrePlaylists?.count || 0) > 0 &&
-          <TitleShowAll
-            title={`Popular ${genre?.name} playlists`}
-            href={`/genre/${params.slug}/playlists`}
-            isShowAll={(genrePlaylists?.count || 0) > 5}
-          >
-            <PlaylistCards playlists={genrePlaylists?.results.slice(0, 5)}/>
-          </TitleShowAll>
-        }
+            {(genreTracks?.count || 0) > 0 &&
+              <TitleShowAll
+                title={`Popular ${genre?.name} tracks`}
+                href={`/genre/${params.slug}/tracks`}
+                isShowAll={(genreTracks?.count || 0) > 5}
+              >
+                <TracksTable
+                  tracks={genreTracks?.results.slice(0, 5)}
+                  showCover
+                  showPlaysCount
+                  showSubtitle
+                />
+              </TitleShowAll>
+            }
 
-        {/*<div>*/}
-        {/*  <TracksTable*/}
-        {/*    tracks={album?.tracks}*/}
-        {/*    showHeader*/}
-        {/*    showSubtitle*/}
-        {/*  />*/}
-        {/*</div>*/}
+            {(genrePlaylists?.count || 0) > 0 &&
+              <TitleShowAll
+                title={`Popular ${genre?.name} playlists`}
+                href={`/genre/${params.slug}/playlists`}
+                isShowAll={(genrePlaylists?.count || 0) > 5}
+              >
+                <PlaylistCards playlists={genrePlaylists?.results.slice(0, 5)}/>
+              </TitleShowAll>
+            }
+          </>
+        )}
 
-        {/*{album?.release_date && (*/}
-        {/*  <div>*/}
-        {/*    <p className="font-normal text-sm mt-10 text-white/60">*/}
-        {/*      {format(new Date(album.release_date), 'MMMM dd, yyyy')}*/}
-        {/*    </p>*/}
-        {/*    <div className="font-normal text-xs text-white/50">*/}
-        {/*      <p>© {format(new Date(album.release_date), 'yyyy')} {album?.artist?.display_name}</p>*/}
-        {/*      <p>℗ {format(new Date(album.release_date), 'yyyy')} {album?.artist?.display_name}</p>*/}
-        {/*    </div>*/}
-        {/*  </div>*/}
-        {/*)}*/}
-
-        <Footer/>
-      </div>
+      </ContentSection>
     </MainSection>
   );
 }

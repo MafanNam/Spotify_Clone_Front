@@ -16,8 +16,8 @@ interface CreateUserResponse {
 
 const authApiSlice = apiSlice.injectEndpoints({
   endpoints: builder => ({
-    retrieveUser: builder.query<User, void>({
-      query: () => '/auth/users/me/',
+    retrieveUserMe: builder.query<User, any | void>({
+      query: ({}) => '/auth/users/me/',
       keepUnusedDataFor: 5,
       async onQueryStarted(_, {dispatch, queryFulfilled}) {
         try {
@@ -30,7 +30,7 @@ const authApiSlice = apiSlice.injectEndpoints({
       },
       providesTags: ['User']
     }),
-    updateUser: builder.mutation<User, void>({
+    updateUserMe: builder.mutation<User, void>({
       query: (data) => ({
         url: '/auth/users/me/',
         method: 'PUT',
@@ -38,7 +38,37 @@ const authApiSlice = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ['User'],
     }),
-    deleteUser: builder.mutation<User, void>({
+    retrieveUserProfile: builder.query<User, any | void>({
+      query: ({}) => '/users/profiles/my/',
+      keepUnusedDataFor: 5,
+      async onQueryStarted(_, {dispatch, queryFulfilled}) {
+        try {
+          const {data} = await queryFulfilled
+          dispatch(setUser(data))
+        } catch (err) {
+        } finally {
+          dispatch(finishInitialLoadUser())
+        }
+      },
+      providesTags: ['User']
+    }),
+    updateUserProfile: builder.mutation<User, object>({
+      query: (data) => ({
+        url: '/users/profiles/my/',
+        method: 'PUT',
+        body: data,
+      }),
+      invalidatesTags: ['User'],
+    }),
+    updateUserProfileImage: builder.mutation<User, void>({
+      query: (data) => ({
+        url: '/users/profiles/my/image/',
+        method: "PUT",
+        body: data,
+      }),
+      invalidatesTags: ['User'],
+    }),
+    deleteUserMe: builder.mutation<User, object>({
       query: (data) => ({
         url: '/auth/users/me/',
         method: 'DELETE',
@@ -75,10 +105,10 @@ const authApiSlice = apiSlice.injectEndpoints({
       },
     }),
     register: builder.mutation({
-      query: ({first_name, last_name, type_profile, email, password, re_password}) => ({
+      query: ({email, type_profile, password, re_password}) => ({
         url: '/auth/users/',
         method: 'POST',
-        body: {first_name, last_name, type_profile, email, password, re_password},
+        body: {email, type_profile, password, re_password},
       })
     }),
     verify: builder.mutation({
@@ -119,9 +149,12 @@ const authApiSlice = apiSlice.injectEndpoints({
 });
 
 export const {
-  useRetrieveUserQuery,
-  useUpdateUserMutation,
-  useDeleteUserMutation,
+  useRetrieveUserMeQuery,
+  useUpdateUserMeMutation,
+  useRetrieveUserProfileQuery,
+  useUpdateUserProfileMutation,
+  useUpdateUserProfileImageMutation,
+  useDeleteUserMeMutation,
   useSocialAuthenticateMutation,
   useLoginMutation,
   useRegisterMutation,

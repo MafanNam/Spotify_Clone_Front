@@ -1,11 +1,12 @@
 "use client";
 
 import {useListUserFollowingQuery} from "@/lib/features/other/publicApiSlice";
-import Footer from "@/components/general/Footer";
 import UserCards from "@/components/users/UserCards";
 import {usePathname} from "next/navigation";
 import TitleShowAll from "@/components/ui/title-show-all";
 import MainSection from "@/components/general/main-section";
+import FullScreenSpinner from "@/components/general/FullScreenSpinner";
+import ContentSection from "@/components/general/content-section";
 
 
 export default function UserFollowingPage() {
@@ -23,21 +24,21 @@ export default function UserFollowingPage() {
 
   return (
     <MainSection>
-      <div className="mx-6 my-6 space-y-6">
-        {(userFollowing?.length || 0) > 0 && (
-          <div className="mt-20">
-            <TitleShowAll
-              title="Following"
-              isShowAll={false}
-              className="text-4xl"
-            >
-              <UserCards users={userFollowing}/>
-            </TitleShowAll>
-          </div>
+      <ContentSection>
+        {load ? <FullScreenSpinner/> : (
+          (userFollowing?.length || 0) > 0 && (
+            <div className="mt-20">
+              <TitleShowAll
+                title="Following"
+                isShowAll={false}
+                className="text-4xl"
+              >
+                <UserCards users={userFollowing}/>
+              </TitleShowAll>
+            </div>
+          )
         )}
-
-        <Footer/>
-      </div>
+      </ContentSection>
     </MainSection>
   );
 }

@@ -2,10 +2,10 @@ import type {Metadata} from "next";
 
 
 export const metadata: Metadata = {
-  title: 'Spotify - Users'
+  title: 'Sign up - Spotify'
 }
 
-export default function UsersLayout({
+export default function Layout({
                                           children,
                                         }: Readonly<{
   children: React.ReactNode;
