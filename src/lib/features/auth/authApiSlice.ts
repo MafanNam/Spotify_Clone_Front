@@ -1,6 +1,6 @@
 import {apiSlice} from "@/lib/services/apiSlice";
 import {finishInitialLoadUser, setUser} from "@/lib/features/auth/authSlice";
-import {User} from "@/types/types";
+import {ShortUser, ShortUsers, User} from "@/types/types";
 
 interface SocialAuthArgs {
   provider: string;
@@ -41,15 +41,6 @@ const authApiSlice = apiSlice.injectEndpoints({
     retrieveUserProfile: builder.query<User, any | void>({
       query: ({}) => '/users/profiles/my/',
       keepUnusedDataFor: 5,
-      async onQueryStarted(_, {dispatch, queryFulfilled}) {
-        try {
-          const {data} = await queryFulfilled
-          dispatch(setUser(data))
-        } catch (err) {
-        } finally {
-          dispatch(finishInitialLoadUser())
-        }
-      },
       providesTags: ['User']
     }),
     updateUserProfile: builder.mutation<User, object>({
@@ -145,11 +136,49 @@ const authApiSlice = apiSlice.injectEndpoints({
         body: {uid, token, new_password, re_new_password},
       }),
     }),
+    userFollow: builder.mutation({
+      query: ({userId}) => ({
+        url: `/users/${userId}/follow/`,
+        method: 'POST',
+      }),
+      invalidatesTags: ['User'],
+    }),
+    userUnfollow: builder.mutation({
+      query: ({userId}) => ({
+        url: `/users/${userId}/unfollow/`,
+        method: 'POST',
+      }),
+      invalidatesTags: ['User'],
+    }),
+    retrieveUser: builder.query<User, number>({
+      query: (id) => `/auth/users/${id}/`,
+      providesTags: ["User"],
+    }),
+    listUserFollowers: builder.query<ShortUser[], any | void>({
+      query: ({userId}) =>
+        `/users/${userId}/followers/`,
+      providesTags: ["User"],
+    }),
+    listUserFollowing: builder.query<ShortUser[], any | void>({
+      query: ({userId}) =>
+        `/users/${userId}/following/`,
+      providesTags: ["User"],
+    }),
+    listUsersProfile: builder.query<ShortUsers, any | void>({
+      query: ({page = 1, search = ''}) =>
+        `/users/profiles/?page=${page}&search=${search}`,
+      providesTags: ["User"],
+    }),
+    listUser: builder.query<User[], any | void>({
+      query: ({}) => `/auth/users/`,
+      providesTags: ["User"],
+    }),
   }),
 });
 
 export const {
   useRetrieveUserMeQuery,
+  useRetrieveUserQuery,
   useUpdateUserMeMutation,
   useRetrieveUserProfileQuery,
   useUpdateUserProfileMutation,
@@ -163,4 +192,10 @@ export const {
   useActivationMutation,
   useResetPasswordMutation,
   useResetPasswordConfirmMutation,
+  useUserFollowMutation,
+  useUserUnfollowMutation,
+  useListUserFollowersQuery,
+  useListUserFollowingQuery,
+  useListUserQuery,
+  useListUsersProfileQuery,
 } = authApiSlice
