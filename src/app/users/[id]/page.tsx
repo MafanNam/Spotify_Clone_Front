@@ -12,7 +12,6 @@ import UserCards from "@/components/users/UserCards";
 import TitleShowAll from "@/components/ui/title-show-all";
 import PlayButtonAndOther from "@/components/ui/play-button-and-other";
 import MainSection from "@/components/general/main-section";
-import FullScreenSpinner from "@/components/general/FullScreenSpinner";
 import ContentSection from "@/components/general/content-section";
 import {useAppSelector} from "@/lib/hooks";
 import {
@@ -20,6 +19,10 @@ import {
   useListUserFollowingQuery,
   useRetrieveUserQuery
 } from "@/lib/features/auth/authApiSlice";
+import {useEffect} from "react";
+import {redirect} from "next/navigation";
+import {profileMyUrl} from "@/utils/consts";
+import FullScreenSpinner from "@/components/general/FullScreenSpinner";
 
 interface Props {
   params: {
@@ -28,7 +31,7 @@ interface Props {
 }
 
 export default function UserPage({params}: Props) {
-  const {isAuthenticated, user: currUser} = useAppSelector(state => state.auth)
+  const {user: currUser} = useAppSelector(state => state.auth)
   const {data: user, isLoading, isFetching} = useRetrieveUserQuery(params.id)
   const userId = user?.id || null;
   const {
@@ -60,9 +63,13 @@ export default function UserPage({params}: Props) {
 
   const userBgColor = user?.color || "#202020";
 
+  useEffect(() => {
+    if (currUser?.id === userId) redirect(profileMyUrl);
+  }, [currUser?.id, userId]);
+
   return (
     <MainSection bgColor={userBgColor} bgGradient="30%">
-      <div className="h-60 bg-opacity-30 bg-black">
+      <div className="h-52 md:h-60 bg-opacity-30 bg-black">
         <div className="flex items-end gap-6 p-4 pt-10">
           {user && (
             <>
@@ -72,7 +79,7 @@ export default function UserPage({params}: Props) {
                   alt={user.display_name}
                   height={170}
                   width={170}
-                  className="aspect-square object-cover shadow-2xl rounded-full h-44 w-44"
+                  className="aspect-square object-cover shadow-2xl rounded-full h-24 w-24 sm:h-32 sm:w-32 md:h-36 md:w-36 lg:h-44 lg:w-44"
                   priority
                 />
               ) : (
@@ -84,7 +91,7 @@ export default function UserPage({params}: Props) {
               <div className="flex flex-col gap-3">
                 <h5 className="text-xs font-semibold text-white/80">Profile</h5>
                 <h2
-                  className="text-6xl xl:text-7xl font-black drop-shadow-sm truncate whitespace-normal">{user.display_name}</h2>
+                  className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl font-black drop-shadow-sm truncate whitespace-normal">{user.display_name}</h2>
 
                 <div className="flex items-center text-sm font-medium">
                   {user.playlists_count >= 0 && (
@@ -123,7 +130,7 @@ export default function UserPage({params}: Props) {
           <>
             <PlayButtonAndOther
               isPlayButton={false}
-              isShowFollow={isAuthenticated}
+              isShowFollow={true}
               isFollowing={userFollowers?.some(follower => follower.id === currUser?.id)}
               userIdFollow={user?.id}
             />
