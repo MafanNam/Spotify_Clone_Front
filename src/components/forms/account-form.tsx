@@ -13,19 +13,21 @@ import {cn} from "@/lib/utils";
 import {Input} from "@/components/ui/input"
 import {Label} from "@/components/ui/label";
 import {Separator} from "@/components/ui/separator";
-import Loader from "@/components/general/Loader";
 import useAccountForm from "@/hooks/useAccountForm";
-import {User} from "@/types/types";
+import {UserProfile} from "@/types/types";
 import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import {countries} from "@/utils/constForm";
-import {Check} from "lucide-react";
+import {Camera, Check, ImageOff} from "lucide-react";
 import {CaretSortIcon} from "@radix-ui/react-icons";
 import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList} from "@/components/ui/command";
+import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
+import getImageData from "@/utils/getImage";
+import FullScreenSpinner from "@/components/general/FullScreenSpinner";
 
 
 interface UserFormProps {
-  user?: User;
+  user: UserProfile | undefined;
 }
 
 export function AccountForm({user}: UserFormProps) {
@@ -37,12 +39,42 @@ export function AccountForm({user}: UserFormProps) {
     setPassword,
     onSubmit,
     handleDelete,
+    tempImage,
+    setTempImage,
   } = useAccountForm(user)
+
+  if (isLoadingDelete || isLoadingUpdate) return <FullScreenSpinner/>
 
   return (
     <>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+          <div className="relative group w-56 h-56 ml-4">
+            <Avatar className="w-full h-full">
+              <AvatarImage src={tempImage} className="aspect-square object-cover"/>
+              <AvatarFallback><ImageOff className="w-16 h-16 text-[#909090]"/></AvatarFallback>
+            </Avatar>
+            <Input
+              {...form.register("image")}
+              type='file'
+              accept='image/*'
+              className='hidden'
+              id='upload-image'
+              onChange={(e) => {
+                const {files, displayUrl} = getImageData(e);
+                setTempImage(displayUrl);
+                form.setValue("image", files);
+              }}
+            />
+            <label
+              htmlFor="upload-image"
+              className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+            >
+              <Camera className="h-10 w-10 text-gray-200"/>
+            </label>
+          </div>
+
+
           <FormField
             control={form.control}
             name="email"
@@ -160,10 +192,7 @@ export function AccountForm({user}: UserFormProps) {
             className='w-full text-gray-100 bg-green-600'
             disabled={isLoadingUpdate}
           >
-            {isLoadingUpdate
-              ? <Loader/>
-              : 'Update profile'
-            }
+            Update profile
           </Button>
         </form>
       </Form>
@@ -186,10 +215,7 @@ export function AccountForm({user}: UserFormProps) {
 
         <Button type="submit" variant="destructive" className='mt-8 w-full'
                 disabled={isLoadingDelete}>
-          {isLoadingDelete
-            ? <Loader/>
-            : 'Delete account'
-          }
+          Delete account
         </Button>
       </form>
     </>

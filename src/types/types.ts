@@ -36,6 +36,16 @@ export interface User extends BaseApi {
   playlists_count: number;
 }
 
+export interface UserProfile extends BaseApi {
+  display_name: string;
+  type_profile: string,
+  email: string;
+  gender: string;
+  country: string;
+  image: string;
+  is_premium: boolean;
+}
+
 export interface ShortUser extends BaseApi {
   display_name: string;
   type_profile: string;
@@ -72,6 +82,13 @@ export interface Artist extends BaseApi {
 
 export interface Artists extends ListBaseApi {
   results: Artist[];
+}
+
+export interface UpdateArtist {
+  first_name: string;
+  last_name: string;
+  display_name: string;
+  image?: string;
 }
 
 export interface License extends BaseApi {
@@ -189,6 +206,19 @@ export interface DetailPlaylist extends Playlist {
   release_date: string;
   favorite_count: number
   duration: string;
+}
+
+export interface UpdatePlaylist {
+  title: string;
+  image: string;
+  description: string;
+  release_date: string;
+  genre: number;
+  is_private: boolean;
+}
+
+export interface ListDetailPlaylist extends ListBaseApi{
+  results: DetailPlaylist[];
 }
 
 export interface Playlists extends ListBaseApi {

@@ -2,10 +2,7 @@
 
 import {BadgeCheck} from "lucide-react";
 import {
-  useListAlbumQuery,
-  useListArtistQuery, useListPlaylistQuery,
-  useListTrackQuery,
-  useRetrieveArtistQuery
+  useListArtistQuery
 } from "@/lib/features/other/publicApiSlice";
 import TracksTable from "@/components/tracks/TracksTable";
 import {useAppSelector} from "@/lib/hooks";
@@ -18,70 +15,48 @@ import PlayButtonAndOther from "@/components/ui/play-button-and-other";
 import MainSection from "@/components/general/main-section";
 import FullScreenSpinner from "@/components/general/FullScreenSpinner";
 import ContentSection from "@/components/general/content-section";
-import {useListUserFollowersQuery} from "@/lib/features/auth/authApiSlice";
-import {useListUserArtistLikedQuery} from "@/lib/features/artists/artistApiSlice";
-import {useEffect} from "react";
-import {redirect} from "next/navigation";
-import {artistProfileMyUrl} from "@/utils/consts";
+import {useRetrieveMeArtistQuery} from "@/lib/features/artists/artistApiSlice";
+import {useListMyTracksQuery} from "@/lib/features/tracks/trackApiSlice";
+import {useListMyAlbumQuery} from "@/lib/features/albums/albumApiSlice";
+import {useListMyPlaylistQuery} from "@/lib/features/playlists/playlistApiSlice";
+import ArtistMyDialogDropdown from "@/components/artists/ArtistMyDialogDropdown";
 
-interface Props {
-  params: {
-    slug: string;
-  };
-}
 
-export default function ArtistPage({params}: Props) {
-  const {isAuthenticated, user: currUser} = useAppSelector(state => state.auth)
-  const {data: artist, isLoading, isFetching} = useRetrieveArtistQuery(params.slug)
-  const userId = artist?.user?.id || undefined;
+export default function Page() {
+  const {data: artist, isLoading, isFetching} = useRetrieveMeArtistQuery()
   const {
     data: artistTracks,
     isLoading: isLoadingTracks,
     isFetching: isFetchingTracks
-  } = useListTrackQuery({artistSlug: params.slug})
+  } = useListMyTracksQuery({})
   const {
     data: artistAlbums,
     isLoading: isLoadingAlbums,
     isFetching: isFetchingAlbums
-  } = useListAlbumQuery({artistSlug: params.slug})
+  } = useListMyAlbumQuery({})
   const {
     data: artistPlaylists,
     isLoading: isLoadingPlaylists,
     isFetching: isFetchingPlaylists
-  } = useListPlaylistQuery({userId}, {skip: !userId})
+  } = useListMyPlaylistQuery({})
   const {
     data: relatedArtists,
     isLoading: isLoadingArtists,
     isFetching: isFetchingArtists
   } = useListArtistQuery({})
-  const {
-    data: userFollowers,
-    isLoading: isLoadingFollowers,
-    isFetching: isFetchingFollowers,
-  } = useListUserFollowersQuery({userId}, {skip: !isAuthenticated || !userId})
-  const {
-    data: artistsFav,
-    isLoading: isLoadingArFav,
-    isFetching: isFetchingArFav,
-  } = useListUserArtistLikedQuery({}, {skip: !isAuthenticated || !userId});
 
   const load = (
     isLoading || isFetching || isLoadingTracks || isFetchingTracks ||
     isLoadingAlbums || isFetchingAlbums || isLoadingArtists || isFetchingArtists ||
-    isLoadingPlaylists || isFetchingPlaylists || isLoadingFollowers || isFetchingFollowers ||
-    isLoadingArFav || isFetchingArFav
+    isLoadingPlaylists || isFetchingPlaylists
   )
 
   const {activeTrack, currentIndex} = useAppSelector(state => state.track)
 
-  const darkenBgColor = artist?.color || "#202020";
-
-  useEffect(() => {
-    if (currUser?.id === userId) redirect(artistProfileMyUrl);
-  }, [currUser?.id, userId]);
+  const artistBgColor = artist?.color || "#202020";
 
   return (
-    <MainSection bgColor={darkenBgColor} bgGradient="30%">
+    <MainSection bgColor={artistBgColor} bgGradient="30%">
       <div
         className="h-64 relative"
         style={{
@@ -113,18 +88,14 @@ export default function ArtistPage({params}: Props) {
       <ContentSection>
         {load ? <FullScreenSpinner/> : (
           <>
-            <PlayButtonAndOther
-              track={artistTracks?.results?.[currentIndex] || (activeTrack || undefined)}
-              tracks={artistTracks?.results}
-              index={currentIndex}
-              isShowFavorite={true}
-              favoriteType="artist"
-              isFavorite={artistsFav?.results?.some((item) => item?.artist?.slug === artist?.slug)}
-              isShowFollow={true}
-              isFollowing={userFollowers?.some(follower => follower.id === currUser?.id)}
-              userIdFollow={userId}
-              slugFav={artist?.slug}
-            />
+            <div className="flex items-center space-x-6">
+              <PlayButtonAndOther
+                track={artistTracks?.results?.[currentIndex] || (activeTrack || undefined)}
+                tracks={artistTracks?.results}
+                index={currentIndex}
+              />
+              <ArtistMyDialogDropdown artist={artist}/>
+            </div>
 
             {(artistTracks?.count || 0) > 0 && (
               <div className="mt-6">

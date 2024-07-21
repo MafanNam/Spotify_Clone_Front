@@ -8,14 +8,20 @@ import {Skeleton} from "@/components/ui/skeleton";
 import Header from "@/components/general/Header";
 import ContentSection from "@/components/general/content-section";
 import {
-  accountMyAnalyticsUrl, accountMyArtistAlbumsUrl, accountMyArtistTracksUrl, accountMyHelpUrl,
-  accountMyPaymentUrl, accountMyPlaylistsUrl,
+  accountMyAnalyticsUrl,
+  accountMyArtistAlbumsUrl,
+  accountMyArtistLicenseUrl,
+  accountMyArtistTracksUrl,
+  accountMyHelpUrl,
+  accountMyPaymentUrl,
   accountMyProfileArtistUrl,
   accountMySettingsUrl,
   accountMySubscriptionUrl,
-  accountMyUrl
+  accountMyUrl, profileMyUrl
 } from "@/utils/consts";
 import {useAppSelector} from "@/lib/hooks";
+import {Button} from "@/components/ui/button";
+import Link from "next/link";
 
 
 interface SettingsLayoutProps {
@@ -34,8 +40,8 @@ export default function SettingsLayout({children}: SettingsLayoutProps) {
         href: accountMyUrl,
       },
       {
-        title: "Playlists",
-        href: accountMyPlaylistsUrl,
+        title: "Profile",
+        href: profileMyUrl,
       },
       {
         title: "Manage your subscription",
@@ -73,8 +79,8 @@ export default function SettingsLayout({children}: SettingsLayoutProps) {
         href: accountMyArtistAlbumsUrl,
       },
       {
-        title: "Playlists",
-        href: accountMyPlaylistsUrl,
+        title: "Artist license",
+        href: accountMyArtistLicenseUrl,
       },
       {
         title: "Manage your subscription",
@@ -119,11 +125,18 @@ export default function SettingsLayout({children}: SettingsLayoutProps) {
       <Header/>
       <ContentSection>
         <div className="mx-auto space-y-6 p-6 pb-10 lg:max-w-4xl">
-          <div className="space-y-0.5">
-            <h2 className="text-2xl font-bold tracking-tight">My account</h2>
-            <p className="text-muted-foreground">
-              Manage your account settings.
-            </p>
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <h2 className="text-2xl font-bold tracking-tight">My account</h2>
+              <p className="text-muted-foreground">
+                Manage your account settings.
+              </p>
+            </div>
+            <Link href={`/`}>
+              <Button variant="outline" className="hover:scale-105 transition duration-150 text-white">
+                Go home
+              </Button>
+            </Link>
           </div>
           <Separator className="my-6"/>
           <div className="flex flex-col space-y-8">
