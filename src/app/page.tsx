@@ -17,6 +17,7 @@ import TitleShowAll from "@/components/ui/title-show-all";
 import MainSection from "@/components/general/main-section";
 import ContentSection from "@/components/general/content-section";
 import {useListUserTracksLikedQuery} from "@/lib/features/tracks/trackApiSlice";
+import {getGreeting} from "@/utils/clientUtils";
 
 
 export default function Home() {
@@ -56,10 +57,11 @@ export default function Home() {
             <>
               <div className="w-full">
                 <div className="flex items-center">
-                  <Link href={"/tracks"} className="mt-4 ml-4">Top tracks</Link>
+                  <Link href={"/tracks"}
+                        className="mt-4 ml-4">{isAuthenticated ? `Good ${getGreeting()}` : 'Top tracks'}</Link>
                 </div>
                 <TrackCardsLittle
-                  tracks={topTracks?.results.slice(0, 7)}
+                  tracks={topTracks?.results.slice(0, isAuthenticated ? 7 : 8)}
                   tracksCollection={likedTracks?.results}
                   isLoading={load}
                 />

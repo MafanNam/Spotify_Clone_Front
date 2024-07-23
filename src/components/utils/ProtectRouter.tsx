@@ -12,23 +12,25 @@ interface Props {
 }
 
 
-export default function ProtectRouter({children, allowedRoles=["User", "Artist"]}: Props) {
+export default function ProtectRouter({children, allowedRoles = ["User", "Artist"]}: Props) {
   const {isAuthenticated} = useAppSelector(state => state.auth)
   const {
     data: user,
     isLoading,
-    isFetching
+    isFetching,
+    isError,
   } = useRetrieveUserMeQuery({}, {skip: !isAuthenticated});
 
-  const {isLoadingUser} = useAppSelector(state => state.auth);
 
-  if (isLoadingUser || isLoading || isFetching) {
+  if (isLoading || isFetching) {
     return <FullScreenSpinner/>
   }
 
-  if (!user) {
+  if (isError) {
     return redirect(loginUrl);
   }
+
+  if (!user && !isAuthenticated) return <FullScreenSpinner/>
 
   if (!allowedRoles.includes(user?.type_profile as string)) {
     return redirect('/');

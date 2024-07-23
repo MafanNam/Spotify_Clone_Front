@@ -32,13 +32,27 @@ const publicApiSlice = apiPublicSlice.injectEndpoints({
       providesTags: ["Album"],
     }),
     listTrack: builder.query<Tracks, any | void>({
-      query: ({page = 1, search = '', artistSlug = '', genreSlug = '', albumSlug = ''}) =>
-        `/tracks/?page=${page}&search=${search}&artist__slug=${artistSlug}&genre__slug=${genreSlug}&album__slug=${albumSlug}`,
+      query: ({page = 1, search = '', artistSlug = '', genreSlug = '', albumSlug = '', ordering = '-plays_count'}) =>
+        `/tracks/?page=${page}&search=${search}&ordering=${ordering}&artist__slug=${artistSlug}&genre__slug=${genreSlug}&album__slug=${albumSlug}`,
       providesTags: ["Track"],
     }),
     retrieveTrack: builder.query<DetailTrack, string | null>({
       query: (slug) => `/tracks/${slug}/`,
       providesTags: ["Track"],
+    }),
+    retrieveListenTrack: builder.query<any, any>({
+      query: ({slug}) => ({
+        url: `/tracks/${slug}/listen/`,
+        responseHandler: (response) => response.blob(),
+      }),
+      providesTags: ["Track"],
+      transformResponse: async (response) => {
+        // @ts-ignore
+        const text = await response.text();
+        console.log("Blob response text:", text);
+        // @ts-ignore
+        return {track_url: URL.createObjectURL(response)};
+      },
     }),
     listPlaylist: builder.query<Playlists, any | void>({
       query: ({page = 1, search = '', userId = '', genreSlug = ''}) =>
@@ -52,6 +66,11 @@ const publicApiSlice = apiPublicSlice.injectEndpoints({
     listRecentlyListenTracks: builder.query<RecentlyListenTracks, any | void>({
       query: ({page = 1, userId}) =>
         `/tracks/recently/user/${userId}/?page=${page}`,
+      providesTags: ["Track"],
+    }),
+    listRecentlyMyListenTracks: builder.query<RecentlyListenTracks, any | void>({
+      query: ({page = 1}) =>
+        `/tracks/recently/my/?page=${page}`,
       providesTags: ["Track"],
     }),
     listGenres: builder.query<Genres, any | void>({
@@ -77,9 +96,11 @@ export const {
   useRetrieveAlbumQuery,
   useListTrackQuery,
   useRetrieveTrackQuery,
+  useRetrieveListenTrackQuery,
   useListPlaylistQuery,
   useRetrievePlaylistQuery,
   useListRecentlyListenTracksQuery,
+  useListRecentlyMyListenTracksQuery,
   useListGenresQuery,
   useRetrieveGenreQuery,
   useDownloadTrackQuery,

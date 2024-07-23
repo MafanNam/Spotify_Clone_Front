@@ -64,7 +64,7 @@ export default function UserPage({params}: Props) {
   const userBgColor = user?.color || "#202020";
 
   useEffect(() => {
-    if (currUser?.id === userId) redirect(profileMyUrl);
+    if (userId && (currUser?.id === userId)) redirect(profileMyUrl);
   }, [currUser?.id, userId]);
 
   return (
@@ -138,7 +138,6 @@ export default function UserPage({params}: Props) {
             {(recentlyTracks?.count || 0) > 0 && (
               <TitleShowAll
                 title="Top tracks this month"
-                titlePB="Only visible to you"
                 href={`/users/${user?.id}/top/tracks`}
                 isShowAll={(recentlyTracks?.count || 0) > 4}
               >
