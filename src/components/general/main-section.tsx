@@ -2,9 +2,8 @@ import Header from "@/components/general/Header";
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from "@/components/ui/resizable";
 import {Sidebar} from "@/components/general/Siderbar";
 import {getCookie, setCookie} from 'cookies-next';
-import {useEffect, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import FullScreenSpinner from "@/components/general/FullScreenSpinner";
-
 
 interface Props {
   children: React.ReactNode;
@@ -21,6 +20,9 @@ export default function MainSection({
                                     }: Props) {
   const [defaultLayout, setDefaultLayout] = useState<number[]>([20, 80]);
   const [isLayoutLoaded, setIsLayoutLoaded] = useState(false);
+  const mainContentRef = useRef<HTMLDivElement>(null);
+  const [bgOpacity, setBgOpacity] = useState(0);
+  const [bgOpacityBlack, setBgOpacityBlack] = useState(0);
 
   useEffect(() => {
     const value = getCookie("react-resizable-panels:layout");
@@ -44,10 +46,32 @@ export default function MainSection({
     setCookie("react-resizable-panels:layout", JSON.stringify(sizes));
   };
 
-  if (!isLayoutLoaded) {
-    return <FullScreenSpinner className="h-[calc(95vh-4rem)]"/>
-  }
+  const handleScroll = () => {
+    const scrollTop = mainContentRef.current?.scrollTop || 0;
+    const maxScroll = 150;
+    const maxScrollBlack = 400;
+    const opacity = Math.min(scrollTop / maxScroll, 0.99);
+    const opacityBlack = Math.min(scrollTop / maxScrollBlack, 0.4);
+    setBgOpacity(opacity);
+    setBgOpacityBlack(opacityBlack);
+  };
 
+  useEffect(() => {
+    const mainContent = mainContentRef.current;
+    if (mainContent) {
+      mainContent.addEventListener("scroll", handleScroll);
+    }
+
+    return () => {
+      if (mainContent) {
+        mainContent.removeEventListener("scroll", handleScroll);
+      }
+    };
+  }, [mainContentRef]);
+
+  if (!isLayoutLoaded) {
+    return <FullScreenSpinner className="h-[calc(96vh-3.8rem)]"/>;
+  }
 
   return (
     <ResizablePanelGroup
@@ -59,19 +83,23 @@ export default function MainSection({
                       className="min-w-60 hidden sm:block">
         <Sidebar/>
       </ResizablePanel>
-      <ResizableHandle className="bg-black/0 hover:bg-white/40 hidden sm:flex my-4 mx-1 cursor-grab active:cursor-grabbing"/>
+      <ResizableHandle
+        className="bg-black/0 hover:bg-white/40 hidden sm:flex my-4 ml-[0.20rem] mr-[0.20rem] cursor-grab active:cursor-grabbing"/>
       <ResizablePanel defaultSize={defaultLayout?.[1] || 80}>
         <div className="grid grid-cols-8">
           <div
-            className="flex flex-col h-[calc(95vh-4rem)] bg-[#131313] w-auto overflow-auto col-span-8 rounded-lg ml-2 sm:ml-0 mt-2 mr-2">
-            <main>
+            ref={mainContentRef}
+            onScroll={handleScroll}
+            className="flex flex-col h-[calc(96vh-3.8rem)] bg-[#131313] w-auto overflow-auto col-span-8 rounded-lg ml-2 sm:ml-0 mt-2 mr-2">
+            <main className="rounded-lg">
               <div
-                className={`h-full w-full rounded-lg ${className}`}
+                className={`h-full w-full rounded-lg relative ${className}`}
                 style={{
                   backgroundImage: `linear-gradient(to bottom, ${bgColor} 0%, #131313 ${bgGradient}, #131313 100%)`,
+                  transition: 'background-image 1s ease',
                 }}
               >
-                <Header/>
+                <Header bgOpacity={bgOpacity} bgOpacityBlack={bgOpacityBlack} bgColor={bgColor}/>
                 {children}
               </div>
             </main>
@@ -79,5 +107,5 @@ export default function MainSection({
         </div>
       </ResizablePanel>
     </ResizablePanelGroup>
-  )
+  );
 }

@@ -44,17 +44,10 @@ export default function RootLayout({
         <Setup/>
 
         <TrackPlayerProvider>
-          {isAccountAuthPage ? (
-            <main>
-              {children}
-            </main>
-          ) : (
-            <main>
-              {children}
-              <PreviewPlayer/>
-            </main>
-
-          )}
+          <main>
+            {children}
+            {!isAccountAuthPage && <PreviewPlayer/>}
+          </main>
         </TrackPlayerProvider>
       </ReduxStoreProvider>
     </ThemeProvider>
