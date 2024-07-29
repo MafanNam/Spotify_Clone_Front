@@ -1,12 +1,14 @@
 # Spotify Clone
 
-![Spotify title]()
+![Spotify title](https://raw.githubusercontent.com/MafanNam/Spotify_Clone_Front/main/assets/title.gif)
 
 <br>
 
 Spotify_Clone_Front is a Spotify clone built using Next.js, Redux(RTK Q), TailwindCSS and
 my [django API](https://github.com/MafanNam/Spotify_Clone_API).
 Users can log in / sign up with their account and view or create the playlists, artists, and albums followed by them.
+
+[![Watch the video](https://img.youtube.com/vi/vPs_6Bem9uY/0.jpg)](https://www.youtube.com/watch?v=vPs_6Bem9uY)
 
 ## Table of contents
 
@@ -133,7 +135,7 @@ and follow the steps
 
 ## Data flow
 
-![Spotify data flow]()
+![Spotify data flow](https://raw.githubusercontent.com/MafanNam/Spotify_Clone_Front/main/assets/data_flow.png)
 
 <section id="api"/>
 
@@ -147,53 +149,59 @@ Please go to this [link](https://github.com/MafanNam/Spotify_Clone_API/) and fol
 
 **Home page**
 
-![home page]()
+![home page](https://raw.githubusercontent.com/MafanNam/Spotify_Clone_Front/main/assets/home.gif)
 
 <br>
 
 **Browse categories**
 
-![category]()
+![category](https://raw.githubusercontent.com/MafanNam/Spotify_Clone_Front/main/assets/category.gif)
 
 <br>
 
 **Search**
 
-![search]()
+![search](https://raw.githubusercontent.com/MafanNam/Spotify_Clone_Front/main/assets/search.gif)
 
 
 <br>
 
 **View Artist**
 
-![artist]()
+![artist](https://raw.githubusercontent.com/MafanNam/Spotify_Clone_Front/main/assets/artist.gif)
+
+<br>
+
+**View Album**
+
+![album](https://raw.githubusercontent.com/MafanNam/Spotify_Clone_Front/main/assets/album.gif)
 
 <br>
 
 **View Playlist**
 
-![playlist]()
+![playlist](https://raw.githubusercontent.com/MafanNam/Spotify_Clone_Front/main/assets/playlist.gif)
 
 <br>
 
 **View Track**
 
-![track]()
+![track](https://raw.githubusercontent.com/MafanNam/Spotify_Clone_Front/main/assets/track.gif)
 
 <br>
 
 **View Account**
 
-![log in]()
-![sing up]()
+![log in](https://raw.githubusercontent.com/MafanNam/Spotify_Clone_Front/main/assets/login.gif)
+![sing up](https://raw.githubusercontent.com/MafanNam/Spotify_Clone_Front/main/assets/signup.gif)
 
-![account]()
+![account](https://raw.githubusercontent.com/MafanNam/Spotify_Clone_Front/main/assets/account.gif)
 
-![profile]()
+![artist_profile](https://raw.githubusercontent.com/MafanNam/Spotify_Clone_Front/main/assets/artist_profile.gif)
+![user_profile](https://raw.githubusercontent.com/MafanNam/Spotify_Clone_Front/main/assets/user_profile.gif)
 
-![album]()
-
-![track]()
+![artist_album](https://raw.githubusercontent.com/MafanNam/Spotify_Clone_Front/main/assets/artist_album.gif)
+![artist_track](https://raw.githubusercontent.com/MafanNam/Spotify_Clone_Front/main/assets/artist_track.gif)
 
 ## Author
 
