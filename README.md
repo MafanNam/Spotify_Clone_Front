@@ -55,7 +55,7 @@ Users can log in / sign up with their account and view or create the playlists, 
 
 ## To-do features
 
-- [ ] Add colors for dynamic headers scroll
+- [x] Add colors for dynamic headers scroll
 - [ ] Improve track player
 - [ ] Improve Shuffle
 - [ ] For premium user download track
