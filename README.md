@@ -19,6 +19,7 @@ Users can log in / sign up with their account and view or create the playlists, 
 - [Environment variables](#env)
 - [Data flow](#data_flow)
 - [API Reference](#api)
+- [Responsive Web Design](#responsive_web_design)
 - [Screenshots](#screenshots)
 
 <section id="technologies" />
@@ -143,6 +144,12 @@ and follow the steps
 
 Please go to this [link](https://github.com/MafanNam/Spotify_Clone_API/) and follow the steps. There more information.
 
+<section id="responsive_web_design"/>
+
+## Responsive Web Design
+
+![responsive_web_design](https://raw.githubusercontent.com/MafanNam/Spotify_Clone_Front/main/assets/responsive.gif)
+
 <section id="screenshots"/>
 
 ## Screenshots
@@ -193,14 +200,17 @@ Please go to this [link](https://github.com/MafanNam/Spotify_Clone_API/) and fol
 **View Account**
 
 ![log in](https://raw.githubusercontent.com/MafanNam/Spotify_Clone_Front/main/assets/login.gif)
+
 ![sing up](https://raw.githubusercontent.com/MafanNam/Spotify_Clone_Front/main/assets/signup.gif)
 
 ![account](https://raw.githubusercontent.com/MafanNam/Spotify_Clone_Front/main/assets/account.gif)
 
 ![artist_profile](https://raw.githubusercontent.com/MafanNam/Spotify_Clone_Front/main/assets/artist_profile.gif)
+
 ![user_profile](https://raw.githubusercontent.com/MafanNam/Spotify_Clone_Front/main/assets/user_profile.gif)
 
 ![artist_album](https://raw.githubusercontent.com/MafanNam/Spotify_Clone_Front/main/assets/artist_album.gif)
+
 ![artist_track](https://raw.githubusercontent.com/MafanNam/Spotify_Clone_Front/main/assets/artist_track.gif)
 
 ## Author
